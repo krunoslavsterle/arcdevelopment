@@ -1,0 +1,14 @@
+* Use SVG (if possible)!
+    * can be responsive without loosing quality
+    * small in size
+    * customizable (color, hight, width, etc.)
+
+* Use JPG/PNG (if can't use SVG)
+
+* Test the performance of the website using the Google PageSpeed Insights (https://developers.google.com/speed/pagespeed/insights/)
+
+* Use compression tools: 
+  * https://tinyjpg.com/ (jpg/png)
+  * https://jakearchibald.github.io/svgomg/ (svg)
+  * try using Photoshop/Gimp
+  
