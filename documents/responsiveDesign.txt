@@ -1,0 +1,6 @@
+Best Practices:
+
+  * Relative units (%, em, rem, vh, vw)
+  * Media Queries
+  * Grid System
+  * Testing

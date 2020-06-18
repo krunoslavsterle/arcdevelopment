@@ -10,6 +10,8 @@ import useScrollTrigger from "@material-ui/core/useScrollTrigger";
 import { Link } from "react-router-dom";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import { useTheme } from "@material-ui/core/styles";
 
 import logo from "../../assets/logo.svg";
 
@@ -32,9 +34,21 @@ const useStyles = makeStyles((theme) => ({
 
     // This is hard-coded value that works in this case but we could rewrite the toolbar style inside the Theme so that the image changes the height with the toolbar.
     marginBottom: "3em",
+    [theme.breakpoints.down("md")]: {
+      marginBottom: "2em",
+    },
+    [theme.breakpoints.down("xs")]: {
+      marginBottom: "1em",
+    },
   },
   logo: {
     height: "8em",
+    [theme.breakpoints.down("md")]: {
+      height: "7em",
+    },
+    [theme.breakpoints.down("xs")]: {
+      height: "5.5em",
+    },
   },
   tabContainer: {
     marginLeft: "auto",
@@ -73,6 +87,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Header(props) {
   const classes = useStyles();
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.down("md"));
   const [value, setValue] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = useState(false);
@@ -162,6 +178,77 @@ export default function Header(props) {
     }
   }, [value]);
 
+  const tabs = (
+    <React.Fragment>
+      <Tabs
+        value={value}
+        className={classes.tabContainer}
+        onChange={handleChange}
+        indicatorColor="primary"
+      >
+        <Tab className={classes.tab} component={Link} to="/" label="Home" />
+        <Tab
+          aria-owns={anchorEl ? "simple-menu" : undefined}
+          aria-haspopup={anchorEl ? "true" : undefined}
+          className={classes.tab}
+          component={Link}
+          onMouseOver={(event) => handleClick(event)}
+          to="/services"
+          label="Services"
+        />
+        <Tab
+          className={classes.tab}
+          component={Link}
+          to="/revolution"
+          label="Revolution"
+        />
+        <Tab
+          className={classes.tab}
+          component={Link}
+          to="about"
+          label="About Us"
+        />
+        <Tab
+          className={classes.tab}
+          component={Link}
+          to="contact"
+          label="Contact Us"
+        />
+      </Tabs>
+      <Button variant="contained" color="secondary" className={classes.button}>
+        Free Estimate
+      </Button>
+      <Menu
+        id="simple-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        // This is the way to set the class to specific component (in this case the paper). See the documentation.
+        classes={{ paper: classes.menu }}
+        // This is the way to access the props on base component (MenuList)
+        MenuListProps={{ onMouseLeave: handleClose }}
+        elevation={0}
+      >
+        {menuOptions.map((option, i) => (
+          <MenuItem
+            key={option}
+            component={Link}
+            to={option.link}
+            classes={{ root: classes.menuItem }}
+            selected={i === selectedIndex && value === 1}
+            onClick={(event) => {
+              handleMenuItemClick(event, i);
+              setValue(1);
+              handleClose();
+            }}
+          >
+            {option.name}
+          </MenuItem>
+        ))}
+      </Menu>
+    </React.Fragment>
+  );
+
   return (
     <React.Fragment>
       <ElevationScroll>
@@ -178,81 +265,7 @@ export default function Header(props) {
             >
               <img alt="company logo" src={logo} className={classes.logo} />
             </Button>
-            <Tabs
-              value={value}
-              className={classes.tabContainer}
-              onChange={handleChange}
-              indicatorColor="primary"
-            >
-              <Tab
-                className={classes.tab}
-                component={Link}
-                to="/"
-                label="Home"
-              />
-              <Tab
-                aria-owns={anchorEl ? "simple-menu" : undefined}
-                aria-haspopup={anchorEl ? "true" : undefined}
-                className={classes.tab}
-                component={Link}
-                onMouseOver={(event) => handleClick(event)}
-                to="/services"
-                label="Services"
-              />
-              <Tab
-                className={classes.tab}
-                component={Link}
-                to="/revolution"
-                label="Revolution"
-              />
-              <Tab
-                className={classes.tab}
-                component={Link}
-                to="about"
-                label="About Us"
-              />
-              <Tab
-                className={classes.tab}
-                component={Link}
-                to="contact"
-                label="Contact Us"
-              />
-            </Tabs>
-            <Button
-              variant="contained"
-              color="secondary"
-              className={classes.button}
-            >
-              Free Estimate
-            </Button>
-            <Menu
-              id="simple-menu"
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleClose}
-              // This is the way to set the class to specific component (in this case the paper). See the documentation.
-              classes={{ paper: classes.menu }}
-              // This is the way to access the props on base component (MenuList)
-              MenuListProps={{ onMouseLeave: handleClose }}
-              elevation={0}
-            >
-              {menuOptions.map((option, i) => (
-                <MenuItem
-                  key={option}
-                  component={Link}
-                  to={option.link}
-                  classes={{ root: classes.menuItem }}
-                  selected={i === selectedIndex && value === 1}
-                  onClick={(event) => {
-                    handleMenuItemClick(event, i);
-                    setValue(1);
-                    handleClose();
-                  }}
-                >
-                  {option.name}
-                </MenuItem>
-              ))}
-            </Menu>
+            {matches ? null : tabs}
           </Toolbar>
         </AppBar>
       </ElevationScroll>
