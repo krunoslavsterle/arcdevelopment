@@ -82,6 +82,9 @@ const useStyles = makeStyles((theme) => ({
     color: "white",
     borderRadius: 0,
   },
+  menuRoot: {
+    zIndex: 5000,
+  },
   menuItem: {
     ...theme.typography.tab,
     opacity: 0.7,
@@ -126,14 +129,13 @@ export default function Header(props) {
   const iOS = process.browser && /iPad|iPhone|iPod/.test(navigator.userAgent); // This is for performance optimization (see Material UI documentation for SwipeableDrawer)
   const matches = useMediaQuery(theme.breakpoints.down("md"));
 
-  const [value, setValue] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
   const [openMenu, setOpenMenu] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(0);
+
   const [openDrawer, setOpenDrawer] = useState(false);
 
   const handleChange = (e, newValue) => {
-    setValue(newValue);
+    props.setValue(newValue);
   };
 
   const handleClick = (e) => {
@@ -144,7 +146,7 @@ export default function Header(props) {
   const handleMenuItemClick = (e, i) => {
     setAnchorEl(null);
     setOpenMenu(false);
-    setSelectedIndex(i);
+    props.setSelectedIndex(i);
   };
 
   const handleClose = (e) => {
@@ -193,10 +195,13 @@ export default function Header(props) {
     [...menuOptions, ...routes].forEach((route) => {
       switch (window.location.pathname) {
         case route.link:
-          if (value !== route.activeindex) {
-            setValue(route.activeIndex);
-            if (route.selectedIndex && route.selectedIndex !== selectedIndex) {
-              setSelectedIndex(route.selectedIndex);
+          if (props.value !== route.activeindex) {
+            props.setValue(route.activeIndex);
+            if (
+              route.selectedIndex &&
+              route.selectedIndex !== props.selectedIndex
+            ) {
+              props.setSelectedIndex(route.selectedIndex);
             }
           }
           break;
@@ -204,12 +209,12 @@ export default function Header(props) {
           break;
       }
     });
-  }, [value, menuOptions, selectedIndex, routes]);
+  }, [props.value, menuOptions, props.selectedIndex, routes, props]);
 
   const tabs = (
     <React.Fragment>
       <Tabs
-        value={value}
+        value={props.value}
         className={classes.tabContainer}
         onChange={handleChange}
         indicatorColor="primary"
@@ -235,12 +240,12 @@ export default function Header(props) {
         anchorEl={anchorEl}
         open={openMenu}
         onClose={handleClose}
+        style={{ zIndex: 5000 }}
         // This is the way to set the class to specific component (in this case the paper). See the documentation.
         classes={{ paper: classes.menu }}
         // This is the way to access the props on base component (MenuList)
         MenuListProps={{ onMouseLeave: handleClose }}
         elevation={0}
-        style={{ zindex: 1302 }}
         keepMounted
       >
         {menuOptions.map((option, i) => (
@@ -249,10 +254,10 @@ export default function Header(props) {
             component={Link}
             to={option.link}
             classes={{ root: classes.menuItem }}
-            selected={i === selectedIndex && value === 1}
+            selected={i === props.selectedIndex && props.value === 1}
             onClick={(event) => {
               handleMenuItemClick(event, i);
-              setValue(1);
+              props.setValue(1);
               handleClose();
             }}
           >
@@ -282,11 +287,11 @@ export default function Header(props) {
               button
               component={Link}
               to={route.link}
-              selected={value === route.activeIndex}
+              selected={props.value === route.activeIndex}
               classes={{ selected: classes.draweritemSelected }}
               onClick={() => {
                 setOpenDrawer(false);
-                setValue(route.activeIndex);
+                props.setValue(route.activeIndex);
               }}
             >
               <ListItemText className={classes.drawerItem} disableTypography>
@@ -301,11 +306,11 @@ export default function Header(props) {
             button
             onClick={() => {
               setOpenDrawer(false);
-              setValue(false);
+              props.setValue(false);
             }}
             component={Link}
             to="/estimate"
-            selected={value === 5}
+            selected={props.value === 5}
             classes={{
               root: classes.drawerItemEstimate,
               selected: classes.draweritemSelected,
@@ -339,7 +344,7 @@ export default function Header(props) {
               to="/"
               className={classes.logoContainer}
               disableRipple
-              onClick={() => setValue(0)}
+              onClick={() => props.setValue(0)}
             >
               <img alt="company logo" src={logo} className={classes.logo} />
             </Button>
